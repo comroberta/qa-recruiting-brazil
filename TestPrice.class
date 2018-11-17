@@ -1,0 +1,50 @@
+import org.junit.Test;
+import java.util.Map;
+import java.util.HashMap;
+import static org.junit.Assert.assertEquals;
+
+public class checkOutTest {
+    public int price(String goods) {
+        CheckOut co = new CheckOut(givenPriceRuleSet());
+        for(int i=0; i<goods.length(); i++) {
+            co.scan(String.valueOf(goods.charAt(i)));
+        }
+        return co.total();
+    }
+    @Test
+    public void totals() {
+        assertEquals(0, price(""));
+        assertEquals(40, price("A"));
+        assertEquals(90, price("AB"));
+        assertEquals(135, price("CDBA"));
+        assertEquals(80, price("AA"));
+        assertEquals(100, price("AAA"));
+        assertEquals(140, price("AAAA"));
+        assertEquals(180, price("AAAAA"));
+        assertEquals(200, price("AAAAAA"));
+        assertEquals(150, price("AAAB"));
+        assertEquals(180, price("AAABB"));
+        assertEquals(200, price("AAABBD"));
+        assertEquals(200, price("DABABA"));
+    }
+    @Test
+    public void incremental() {
+        CheckOut co = new CheckOut(givenPriceRuleSet());
+        assertEquals(0, co.total());
+        co.scan("A"); assertEquals(40, co.total());
+        co.scan("B"); assertEquals(90, co.total());
+        co.scan("A"); assertEquals(130, co.total());
+        co.scan("A"); assertEquals(150, co.total());
+        co.scan("B"); assertEquals(180, co.total());
+    }	
+	
+    }
+    private SpecialPriceRuleSet givenPriceRuleSet() {
+        Map<String, SpecialPrice> priceRules = new HashMap<>();
+        priceRules.put("A", new SpecialPrice(40, 3, 100));
+        priceRules.put("B", new SpecialPrice(50, 2, 80));
+        priceRules.put("C", new SpecialPrice(25));
+        priceRules.put("D", new SpecialPrice(20));
+        return new SpecialPriceRuleSet(priceRules);
+    }
+} 
